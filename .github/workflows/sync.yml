@@ -7,7 +7,7 @@ name: Sync
     - cron: '0 16 * * *'
 jobs:
   secrets:
-    name: Secrets
+    name: Sync queries from upstream.
     runs-on: ubuntu-latest
     steps:
       - uses: adrianjost/files-sync-action@master
