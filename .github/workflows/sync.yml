@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: adrianjost/files-sync-action@master
         with:
-          COMMIT_MESSAGE: Update Synced GitHub Automation Workflows
+          COMMIT_MESSAGE: Sync queries from upstream.
           SRC_REPO: |-
             nvim-treesitter/nvim-treesitter-textobjects
           SRC_ROOT: /queries/
