@@ -4,7 +4,7 @@ name: Sync
     branches:
       - master
   schedule:
-    - cron: '0 16 * * *'
+    - cron: '30 * * * *'
 jobs:
   secrets:
     name: Sync queries from upstream.
