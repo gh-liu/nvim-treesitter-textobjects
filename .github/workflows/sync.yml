@@ -1,0 +1,22 @@
+name: Sync
+'on':
+  push:
+    branches:
+      - main
+jobs:
+  secrets:
+    name: Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: adrianjost/files-sync-action@master
+        with:
+          COMMIT_MESSAGE: Update Synced GitHub Automation Workflows
+          SRC_REPO: |-
+            nvim-treesitter/nvim-treesitter-textobjects
+          SRC_ROOT: /queries/
+          FILE_PATTERNS: |-
+            ^.*\.scm$
+          TARGET_REPOS: |-
+            gh-liu/nvim-treesitter-textobjects
+          TARGET_ROOT: /queries/
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
