@@ -1,10 +1,24 @@
 (function_declaration
   body: (statement_block)) @function.outer
 
+(generator_function_declaration
+  body: (statement_block)) @function.outer
+
 (function_expression
   body: (statement_block)) @function.outer
 
 (function_declaration
+  body: (statement_block
+    .
+    "{"
+    .
+    (_) @_start @_end
+    (_)? @_end
+    .
+    "}"
+    (#make-range! "function.inner" @_start @_end)))
+
+(generator_function_declaration
   body: (statement_block
     .
     "{"
@@ -251,3 +265,18 @@
   (pair
     key: (_) @assignment.lhs
     value: (_) @assignment.inner @assignment.rhs) @assignment.outer)
+
+(return_statement
+  (_) @return.inner) @return.outer
+
+(return_statement) @statement.outer
+
+[
+  (if_statement)
+  (expression_statement)
+  (for_statement)
+  (while_statement)
+  (do_statement)
+  (for_in_statement)
+  (export_statement)
+] @statement.outer
