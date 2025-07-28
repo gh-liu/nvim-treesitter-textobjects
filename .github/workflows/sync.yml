@@ -15,7 +15,7 @@ jobs:
         with:
           COMMIT_MESSAGE: Sync queries from upstream.
           SRC_REPO: |-
-            nvim-treesitter/nvim-treesitter-textobjects
+            nvim-treesitter/nvim-treesitter-textobjects:main
           SRC_ROOT: /queries/
           FILE_PATTERNS: |-
             ^.*\.scm$
