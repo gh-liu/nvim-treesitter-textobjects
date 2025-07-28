@@ -7,12 +7,8 @@
   body: (block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
+    _+ @function.inner
+    "}"))
 
 ; quantifies as class(es)
 (struct_item) @class.outer
@@ -21,15 +17,8 @@
   body: (field_declaration_list
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 (enum_item) @class.outer
 
@@ -37,15 +26,8 @@
   body: (enum_variant_list
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 (union_item) @class.outer
 
@@ -53,15 +35,8 @@
   body: (field_declaration_list
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 (trait_item) @class.outer
 
@@ -69,12 +44,8 @@
   body: (declaration_list
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 (impl_item) @class.outer
 
@@ -82,12 +53,8 @@
   body: (declaration_list
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 (mod_item) @class.outer
 
@@ -95,12 +62,8 @@
   body: (declaration_list
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+    _+ @class.inner
+    "}"))
 
 ; conditionals
 (if_expression
@@ -127,43 +90,22 @@
   body: (block
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (while_expression
   body: (block
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (for_expression
   body: (block
     .
     "{"
-    .
-    (_) @_start
-    [
-      (_)
-      ","
-    ]? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 ; blocks
 (_
@@ -179,12 +121,8 @@
   (token_tree
     .
     "("
-    .
-    (_) @_start
-    (_)? @_end
-    .
-    ")"
-    (#make-range! "call.inner" @_start @_end)))
+    _+ @call.inner
+    ")"))
 
 (call_expression) @call.outer
 
@@ -192,12 +130,8 @@
   arguments: (arguments
     .
     "("
-    .
-    (_) @_start
-    (_)? @_end
-    .
-    ")"
-    (#make-range! "call.inner" @_start @_end)))
+    _+ @call.inner
+    ")"))
 
 ; returns
 (return_expression
@@ -213,342 +147,176 @@
 (block_comment) @comment.outer
 
 ; parameter
-((parameters
-  "," @_start
+(parameters
+  "," @parameter.outer
   .
-  (self_parameter) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (self_parameter) @parameter.inner @parameter.outer)
 
-((parameters
+(parameters
   .
-  (self_parameter) @parameter.inner
+  (self_parameter) @parameter.inner @parameter.outer
   .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
 
-; last element, with trailing comma
-((parameters
-  (self_parameter) @_start
+(parameters
+  "," @parameter.outer
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (parameter) @parameter.inner @parameter.outer)
 
-((parameters
-  "," @_start
+(parameters
   .
-  (parameter) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (parameter) @parameter.inner @parameter.outer
+  .
+  ","? @parameter.outer)
 
-((parameters
+(parameters
+  "," @parameter.outer
   .
-  (parameter) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  (type_identifier) @parameter.inner @parameter.outer)
 
-; last element, with trailing comma
-((parameters
-  (parameter) @_start
+(parameters
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (type_identifier) @parameter.inner @parameter.outer
+  .
+  ","? @parameter.outer)
 
-((parameters
-  "," @_start
+(type_parameters
+  "," @parameter.outer
   .
-  (type_identifier) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer)
 
-((parameters
+(type_parameters
   .
-  (type_identifier) @parameter.inner
+  (_) @parameter.inner @parameter.outer
   .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
 
-; last element, with trailing comma
-((parameters
-  (type_identifier) @_start
+(tuple_pattern
+  "," @parameter.outer
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (identifier) @parameter.inner @parameter.outer)
 
-((type_parameters
-  "," @_start
+(tuple_pattern
   .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (identifier) @parameter.inner @parameter.outer
+  .
+  ","? @parameter.outer)
 
-((type_parameters
+(tuple_struct_pattern
+  "," @parameter.outer
   .
-  (_) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  (identifier) @parameter.inner @parameter.outer)
 
-; last element, with trailing comma
-((type_parameters
-  (_) @_start
+(tuple_struct_pattern
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
-
-((tuple_pattern
-  "," @_start
+  (identifier) @parameter.inner @parameter.outer
   .
-  (identifier) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
-
-((tuple_pattern
-  .
-  (identifier) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
-
-; last element, with trailing comma
-((tuple_pattern
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
-
-((tuple_struct_pattern
-  "," @_start
-  .
-  (identifier) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
-
-((tuple_struct_pattern
-  .
-  (identifier) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
-
-; last element, with trailing comma
-((tuple_struct_pattern
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  ","? @parameter.outer)
 
 (tuple_expression
-  "," @_start
+  "," @parameter.outer
   .
-  (_) @parameter.inner
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer)
 
 (tuple_expression
   .
-  (_) @parameter.inner
+  (_) @parameter.inner @parameter.outer
   .
-  ","? @_end
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
 
-; last element, with trailing comma
-((tuple_expression
-  (_) @_start
+(tuple_type
+  "," @parameter.outer
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (_) @parameter.inner @parameter.outer)
 
-((tuple_type
-  "," @_start
+(tuple_type
   .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
-
-((tuple_type
+  (_) @parameter.inner @parameter.outer
   .
-  (_) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
-
-; last element, with trailing comma
-((tuple_type
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  ","? @parameter.outer)
 
 (struct_item
   body: (field_declaration_list
-    "," @_start
+    "," @parameter.outer
     .
-    (_) @parameter.inner
-    (#make-range! "parameter.outer" @_start @parameter.inner)))
+    (_) @parameter.inner @parameter.outer))
 
 (struct_item
   body: (field_declaration_list
     .
-    (_) @parameter.inner
+    (_) @parameter.inner @parameter.outer
     .
-    ","? @_end
-    (#make-range! "parameter.outer" @parameter.inner @_end)))
-
-; last element, with trailing comma
-(struct_item
-  body: (field_declaration_list
-    (_) @_start
-    .
-    "," @_end
-    .
-    (#make-range! "parameter.outer" @_start @_end)))
+    ","? @parameter.outer))
 
 (struct_expression
   body: (field_initializer_list
-    "," @_start
+    "," @parameter.outer
     .
-    (_) @parameter.inner
-    (#make-range! "parameter.outer" @_start @parameter.inner)))
+    (_) @parameter.inner @parameter.outer))
 
 (struct_expression
   body: (field_initializer_list
     .
-    (_) @parameter.inner
+    (_) @parameter.inner @parameter.outer
     .
-    ","? @_end
-    (#make-range! "parameter.outer" @parameter.inner @_end)))
+    ","? @parameter.outer))
 
-; last element, with trailing comma
-(struct_expression
-  body: (field_initializer_list
-    (_) @_start
-    .
-    "," @_end
-    .
-    (#make-range! "parameter.outer" @_start @_end)))
+(closure_parameters
+  "," @parameter.outer
+  .
+  (_) @parameter.inner @parameter.outer)
 
-((closure_parameters
-  "," @_start
+(closure_parameters
   .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer
+  .
+  ","? @parameter.outer)
 
-((closure_parameters
+(arguments
+  "," @parameter.outer
   .
-  (_) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  (_) @parameter.inner @parameter.outer)
 
-; last element, with trailing comma
-((closure_parameters
-  (_) @_start
+(arguments
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (_) @parameter.inner @parameter.outer
+  .
+  ","? @parameter.outer)
 
-((arguments
-  "," @_start
+(type_arguments
+  "," @parameter.outer
   .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer)
 
-((arguments
+(type_arguments
   .
-  (_) @parameter.inner
+  (_) @parameter.inner @parameter.outer
   .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
 
-; last element, with trailing comma
-((arguments
-  (_) @_start
+(token_tree
+  "," @parameter.outer
   .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  (_) @parameter.inner @parameter.outer)
 
-((type_arguments
-  "," @_start
+(token_tree
   .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
-
-((type_arguments
+  (_) @parameter.inner @parameter.outer
   .
-  (_) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
-
-; last element, with trailing comma
-((type_arguments
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
-
-((token_tree
-  "," @_start
-  .
-  (_) @parameter.inner)
-  (#make-range! "parameter.outer" @_start @parameter.inner))
-
-((token_tree
-  .
-  (_) @parameter.inner
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @parameter.inner @_end))
-
-; last element, with trailing comma
-((token_tree
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+  ","? @parameter.outer)
 
 (scoped_use_list
   list: (use_list
-    "," @_start
+    "," @parameter.outer
     .
-    (_) @parameter.inner
-    (#make-range! "parameter.outer" @_start @parameter.inner)))
+    (_) @parameter.inner @parameter.outer))
 
 (scoped_use_list
   list: (use_list
     .
-    (_) @parameter.inner
+    (_) @parameter.inner @parameter.outer
     .
-    ","? @_end
-    (#make-range! "parameter.outer" @parameter.inner @_end)))
-
-; last element, with trailing comma
-(scoped_use_list
-  list: (use_list
-    (_) @_start
-    .
-    "," @_end
-    .
-    (#make-range! "parameter.outer" @_start @_end)))
-
-(array_expression
-  (_) @parameter.inner)
-
-; first element, with or without comma
-((array_expression
-  .
-  (_) @_start
-  .
-  ","? @_end)
-  (#make-range! "parameter.outer" @_start @_end))
-
-; second to last element (with leading comma)
-((array_expression
-  "," @_start
-  .
-  (_) @_end)
-  (#make-range! "parameter.outer" @_start @_end))
-
-; last element, with trailing comma
-((array_expression
-  (_) @_start
-  .
-  "," @_end .)
-  (#make-range! "parameter.outer" @_start @_end))
+    ","? @parameter.outer))
 
 [
   (integer_literal)

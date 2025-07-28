@@ -1,9 +1,6 @@
 (function_declaration
   body: (statement_block)) @function.outer
 
-(generator_function_declaration
-  body: (statement_block)) @function.outer
-
 (function_expression
   body: (statement_block)) @function.outer
 
@@ -11,34 +8,15 @@
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
-
-(generator_function_declaration
-  body: (statement_block
-    .
-    "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
+    _+ @function.inner
+    "}"))
 
 (function_expression
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
+    _+ @function.inner
+    "}"))
 
 (export_statement
   (function_declaration)) @function.outer
@@ -50,12 +28,8 @@
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
+    _+ @function.inner
+    "}"))
 
 (method_definition
   body: (statement_block)) @function.outer
@@ -64,26 +38,11 @@
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "function.inner" @_start @_end)))
+    _+ @function.inner
+    "}"))
 
 (class_declaration
-  body: (class_body)) @class.outer
-
-(class_declaration
-  body: (class_body
-    .
-    "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "class.inner" @_start @_end)))
+  body: (class_body) @class.inner) @class.outer
 
 (export_statement
   (class_declaration)) @class.outer
@@ -92,68 +51,44 @@
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (for_statement
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (while_statement
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (do_statement
   body: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "loop.inner" @_start @_end))) @loop.outer
+    _+ @loop.inner
+    "}")) @loop.outer
 
 (if_statement
   consequence: (statement_block
     .
     "{"
-    .
-    (_) @_start @_end
-    (_)? @_end
-    .
-    "}"
-    (#make-range! "conditional.inner" @_start @_end))) @conditional.outer
+    _+ @conditional.inner
+    "}")) @conditional.outer
 
 (if_statement
   alternative: (else_clause
     (statement_block
       .
       "{"
-      .
-      (_) @_start @_end
-      (_)? @_end
-      .
-      "}"
-      (#make-range! "conditional.inner" @_start @_end)))) @conditional.outer
+      _+ @conditional.inner
+      "}"))) @conditional.outer
 
 (if_statement) @conditional.outer
 
@@ -166,25 +101,16 @@
   arguments: (arguments
     .
     "("
-    .
-    (_) @_start
-    (_)? @_end
-    .
-    ")"
-    (#make-range! "call.inner" @_start @_end)))
+    _+ @call.inner
+    ")"))
 
-((new_expression
-  constructor: (identifier) @_cons
+(new_expression
+  constructor: (identifier) @call.outer
   arguments: (arguments
     .
     "("
-    .
-    (_) @_start
-    (_)? @_end
-    .
-    ")") @_args)
-  (#make-range! "call.outer" @_cons @_args)
-  (#make-range! "call.inner" @_start @_end))
+    _+ @call.inner
+    ")") @call.outer)
 
 ; blocks
 (_
@@ -195,31 +121,58 @@
 ; function ([ x ]) ...
 ; function (v = default_value)
 (formal_parameters
-  "," @_start
+  "," @parameter.outer
   .
-  (_) @parameter.inner
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer)
 
 (formal_parameters
   .
-  (_) @parameter.inner
+  (_) @parameter.inner @parameter.outer
   .
-  ","? @_end
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
+
+; If the array/object pattern is the first parameter, treat its elements as the argument list
+(formal_parameters
+  .
+  (_
+    [
+      (object_pattern
+        "," @parameter.outer
+        .
+        (_) @parameter.inner @parameter.outer)
+      (array_pattern
+        "," @parameter.outer
+        .
+        (_) @parameter.inner @parameter.outer)
+    ]))
+
+(formal_parameters
+  .
+  (_
+    [
+      (object_pattern
+        .
+        (_) @parameter.inner @parameter.outer
+        .
+        ","? @parameter.outer)
+      (array_pattern
+        .
+        (_) @parameter.inner @parameter.outer
+        .
+        ","? @parameter.outer)
+    ]))
 
 ; arguments
 (arguments
-  "," @_start
+  "," @parameter.outer
   .
-  (_) @parameter.inner
-  (#make-range! "parameter.outer" @_start @parameter.inner))
+  (_) @parameter.inner @parameter.outer)
 
 (arguments
   .
-  (_) @parameter.inner
+  (_) @parameter.inner @parameter.outer
   .
-  ","? @_end
-  (#make-range! "parameter.outer" @parameter.inner @_end))
+  ","? @parameter.outer)
 
 ; comment
 (comment) @comment.outer
@@ -231,10 +184,9 @@
 ; number
 (number) @number.inner
 
-(lexical_declaration
-  (variable_declarator
-    name: (_) @assignment.lhs
-    value: (_) @assignment.inner @assignment.rhs)) @assignment.outer
+(variable_declarator
+  name: (_) @assignment.lhs
+  value: (_) @assignment.inner @assignment.rhs) @assignment.outer
 
 (variable_declarator
   name: (_) @assignment.inner)
@@ -243,133 +195,3 @@
   (pair
     key: (_) @assignment.lhs
     value: (_) @assignment.inner @assignment.rhs) @assignment.outer)
-
-(return_statement
-  (_) @return.inner) @return.outer
-
-(return_statement) @statement.outer
-
-[
-  (if_statement)
-  (expression_statement)
-  (for_statement)
-  (while_statement)
-  (do_statement)
-  (for_in_statement)
-  (export_statement)
-  (lexical_declaration)
-] @statement.outer
-
-; 1.  default import
-(import_statement
-  (import_clause
-    (identifier) @parameter.inner @parameter.outer))
-
-; 2.  namespace import  e.g. `* as React`
-(import_statement
-  (import_clause
-    (namespace_import
-      (identifier) @parameter.inner) @parameter.outer))
-
-; 3.  named import  e.g. `import { Bar, Baz } from ...`
-(import_statement
-  (import_clause
-    (named_imports
-      (import_specifier) @parameter.inner)))
-
-; 3‑A.  named import followed by a comma
-((import_statement
-  (import_clause
-    (named_imports
-      (import_specifier) @_start
-      .
-      "," @_end)))
-  (#make-range! "parameter.outer" @_start @_end))
-
-; 3‑B.  comma followed by named import
-((import_statement
-  (import_clause
-    (named_imports
-      "," @_start
-      .
-      (import_specifier) @_end)))
-  (#make-range! "parameter.outer" @_start @_end))
-
-; 3-C.  only one named import without a comma
-(import_statement
-  (import_clause
-    (named_imports
-      .
-      (import_specifier) @parameter.outer .)))
-
-; Treat list or object elements as @parameter
-; 1. parameter.inner
-(object
-  (_) @parameter.inner)
-
-(array
-  (_) @parameter.inner)
-
-(object_pattern
-  (_) @parameter.inner)
-
-(array_pattern
-  (_) @parameter.inner)
-
-; 2. parameter.outer: Only one element, no comma
-(object
-  .
-  (_) @parameter.outer .)
-
-(array
-  .
-  (_) @parameter.outer .)
-
-(object_pattern
-  .
-  (_) @parameter.outer .)
-
-(array_pattern
-  .
-  (_) @parameter.outer .)
-
-; 3. parameter.outer: Comma before or after
-([
-  (object
-    "," @_start
-    .
-    (_) @_end)
-  (array
-    "," @_start
-    .
-    (_) @_end)
-  (object_pattern
-    "," @_start
-    .
-    (_) @_end)
-  (array_pattern
-    "," @_start
-    .
-    (_) @_end)
-]
-  (#make-range! "parameter.outer" @_start @_end))
-
-([
-  (object
-    (_) @_start
-    .
-    "," @_end)
-  (array
-    (_) @_start
-    .
-    "," @_end)
-  (object_pattern
-    (_) @_start
-    .
-    "," @_end)
-  (array_pattern
-    (_) @_start
-    .
-    "," @_end)
-]
-  (#make-range! "parameter.outer" @_start @_end))
